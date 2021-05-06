@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connections</title>
+    <link rel="icon" href="../assets/images/logo2.png">
+    <link rel="stylesheet" href="../assets/css/connection.css">
+</head>
+
+<body>
+    <%- include('partials/menu.ejs') %>
+        <div class="container">
+            <div class="content">
+                <div class="content-text">
+                    <div class="connection_description">
+                        <h1>
+                            <%= connection.title %>
+                        </h1>
+                        <div class="connection_info">
+                            <div class="connection_highlights">
+                                <div>
+                                    <img src="../assets/images/pfp.png" alt="host_user_pfp">
+                                </div>
+                                <div>
+                                    <ul>
+                                        <li>Hosted by John Wick</li>
+                                        <!--                                    <li>Sunday, February 21, 2021</li>-->
+                                        <li>
+                                            <%= connection.dateTime %>
+                                        </li>
+                                        <li>12:30pm-1:00pm</li>
+                                        <!--                                    <li>Online Zoom Call</li>-->
+                                        <li>
+                                            <%= connection.location %>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div>
+                                <h1>Details</h1>
+                                <!--                            <p>An online meetup via Zoom to watch and discuss the latest episode of Mushoku Tensei.-->
+                                <p>
+                                    <%= connection.details %>
+                                </p>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="connect_buttons">
+                        <p>Do you plan on attending? Currently 20 people are attending</p>
+                        <form id="rsvp_form" method="POST">
+                            <input hidden name="connection" value="<%= JSON.stringify(connection) %>">
+                            <div class="buttons">
+                                <button id="yes_button" formaction="/savedConnections" name="rsvp"
+                                    value="Yes">Yes</button>
+                                <button id="no_button" formaction="/savedConnections" name="rsvp" value="No">No</button>
+                                <button id="maybe_button" formaction="/savedConnections" name="rsvp"
+                                    value="Maybe">Maybe</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%- include('partials/footer.ejs') %>
+</body>
+
+</html>

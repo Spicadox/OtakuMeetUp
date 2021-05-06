@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connections</title>
+    <link rel="icon" href="../assets/images/logo2.png">
+    <link rel="stylesheet" href="../assets/css/connections.css">
+</head>
+
+<body>
+    <%- include('partials/menu.ejs') %>
+
+        <div class="container">
+            <div class="content">
+                <div class="content-text">
+                    <div class="content-text">
+                        <img src="../assets/images/Japan-popular-culture.png" alt="culture">
+                        <div class="connections">
+                            <!-- Make sure list items stay in one line so its readable -->
+                            <div class="anime">
+                                <h1>Anime</h1>
+                                <ul>
+                                    <% connections.forEach(function(connection){ %>
+                                        <% if(connection.category()==='Anime' ) { %>
+                                            <li><a href="connection?id=<%= connection._id %>">
+                                                    <%= connection.title %>
+                                                </a></li>
+                                            <% } %>
+                                                <% }); %>
+
+                                </ul>
+                            </div>
+                            <div class="manga">
+                                <h1>Manga</h1>
+                                <ul>
+                                    <% connections.forEach(function(connection){ %>
+                                        <% if(connection.category==='Manga' ) { %>
+                                            <li><a href="connection?id=<%= connection._id %>">
+                                                    <%= connection.title %>
+                                                </a></li>
+                                            <% } %>
+                                                <% }); %>
+                                </ul>
+                            </div>
+
+                            <div class="games">
+                                <h1>Game</h1>
+                                <ul>
+                                    <% connections.forEach(function(connection){ %>
+                                        <% if(connection.category==='Game' ) { %>
+                                            <li><a href="connection?id=<%= connection._id %>">
+                                                    <%= connection.title %>
+                                                </a></li>
+                                            <% } %>
+                                                <% }); %>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%- include('partials/footer.ejs') %>
+</body>
+
+</html>
