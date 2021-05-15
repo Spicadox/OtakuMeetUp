@@ -1,9 +1,10 @@
 const express = require('express');
+const connectionDB = require('../utils/connectionDB');
 const Connection = require('../models/connection-model');
 
 const router = express.Router();
 
-// routes the connections and connection page
+// routes the 
 router.get('/', function (req, res) {
     // Query for all the connections 
     Connection.find({})

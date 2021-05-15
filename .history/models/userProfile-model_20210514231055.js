@@ -122,9 +122,7 @@ userProfileSchema.methods.updateRSVP = function (updateID, rsvp) {
 userProfileSchema.methods.getConnections = async function () {
     let profileId = this._id;
     return new Promise(function (resolve, reject) {
-        //finds the userprofile and populates it
         UserProfile.findOne({ _id: profileId }).populate({ path: 'userConnections', model: 'userConnection', populate: { path: 'connection', model: 'connection' } }).exec(function (err, populatedUserProfile) {
-            //if the userprofile exist and is not null then return the array of userConnections
             if (populatedUserProfile != null) {
                 return resolve(populatedUserProfile.userConnections);
             }

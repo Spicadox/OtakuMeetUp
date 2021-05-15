@@ -20,7 +20,7 @@ userProfileSchema.methods.addConnection = function (userConnection) {
     return new Promise(function (resolve, reject) {
         // const filter = { _id: this._id, 'userConnections.connection': userConnection };
         // const update = { $set: { 'userConnections.rsvp': userConnection.rsvp }, $push: { 'userConnections': userConnection } };
-
+        
         // finds the user's userprofile based on the id
         UserProfile.findOne({ _id: id }, 'userConnections', { new: true })
             .populate({ path: 'userConnections', model: 'userConnection', populate: { path: 'connection', model: 'connection' } }).exec(function (err, updatedUserProfile) {
@@ -37,7 +37,7 @@ userProfileSchema.methods.addConnection = function (userConnection) {
                             return reject();
                         }
                     }
-                    // push the userconnection into the array of user connections if the iteration reaches the end and there are no connection match
+                    // push the userconnection into the array of user connections if there are no userconnections
                     else if (i == updatedUserProfile.userConnections.length - 1) {
                         updatedUserProfile.userConnections.push(userConnection);
                         updatedUserProfile.save();
@@ -56,20 +56,15 @@ userProfileSchema.methods.addConnection = function (userConnection) {
     })
 }
 
-// method that takes in a connection ID and removes it from the userConnections array
 userProfileSchema.methods.removeConnection = function (deleteID) {
     let userProfileId = this._id;
     return new Promise(function (resolve, reject) {
 
         // const filter = { _id: this._id, 'userConnections.connection': userConnection };
         // const update = { $set: { 'userConnections.rsvp': userConnection.rsvp }, $push: { 'userConnections': userConnection } };
-
-        // find the userProfile and populate the references
         UserProfile.findOne({ _id: userProfileId }, 'userConnections', { new: true })
             .populate({ path: 'userConnections', model: 'userConnection', populate: { path: 'connection', model: 'connection' } }).exec(function (err, updatedUserProfile) {
-                //iterates through all the userconnections to find the connection to delete
                 for (let i = 0; i < updatedUserProfile.userConnections.length; i++) {
-                    //if the deleteID matches a connection id in the array then remove it
                     if (updatedUserProfile.userConnections[i].connection._id == deleteID) {
                         let userConnectionID = updatedUserProfile.userConnections[i]._id;
                         updatedUserProfile.userConnections.splice(i, 1);
@@ -77,7 +72,6 @@ userProfileSchema.methods.removeConnection = function (deleteID) {
                         updatedUserProfile.save();
                         return resolve();
                     }
-                    //fail safe to reject the promise if there are no connection match(should never come to this though)
                     else if (i == updatedUserProfile.userConnections.length - 1) {
                         return reject();
                     }
@@ -86,28 +80,31 @@ userProfileSchema.methods.removeConnection = function (deleteID) {
     })
 }
 
-//method that updates the connection rsvp by taking in the connection ID and new rsvp
 userProfileSchema.methods.updateRSVP = function (updateID, rsvp) {
     let userProfileId = this._id;
     return new Promise(function (resolve, reject) {
 
         // const filter = { _id: this._id, 'userConnections.connection': userConnection };
         // const update = { $set: { 'userConnections.rsvp': userConnection.rsvp }, $push: { 'userConnections': userConnection } };
-
-        // find the userProfile and populate the references
         UserProfile.findOne({ _id: userProfileId }, 'userConnections', { new: true })
             .populate({ path: 'userConnections', model: 'userConnection', populate: { path: 'connection', model: 'connection' } }).exec(function (err, updatedUserProfile) {
-                //iterates through the userconnections
+                console.log("BEFORE FOR LOOP");
+                console.log(rsvp);
                 for (let i = 0; i < updatedUserProfile.userConnections.length; i++) {
-                    //if the connection id matches updateID 
+                    console.log("1");
                     if (updatedUserProfile.userConnections[i].connection._id == updateID) {
-                        //if rsvp doesn't match new rsvp then set new rsvp
+                        console.log("INSIDE CHECKING ID")
                         if (updatedUserProfile.userConnections[i].rsvp != rsvp) {
+
                             updatedUserProfile.userConnections[i].rsvp = rsvp;
+                            console.log(updatedUserProfile.userConnections[i].rsvp)
+                            console.log(rsvp);
                             updatedUserProfile.userConnections[i].save((err) => reject(err));
+
                             return resolve();
                         }
                         else {
+
                             return reject();
                         }
                     }
@@ -118,13 +115,10 @@ userProfileSchema.methods.updateRSVP = function (updateID, rsvp) {
     })
 }
 
-//method that gets all the connections from the array of user connections
 userProfileSchema.methods.getConnections = async function () {
     let profileId = this._id;
     return new Promise(function (resolve, reject) {
-        //finds the userprofile and populates it
         UserProfile.findOne({ _id: profileId }).populate({ path: 'userConnections', model: 'userConnection', populate: { path: 'connection', model: 'connection' } }).exec(function (err, populatedUserProfile) {
-            //if the userprofile exist and is not null then return the array of userConnections
             if (populatedUserProfile != null) {
                 return resolve(populatedUserProfile.userConnections);
             }

@@ -20,7 +20,7 @@ userProfileSchema.methods.addConnection = function (userConnection) {
     return new Promise(function (resolve, reject) {
         // const filter = { _id: this._id, 'userConnections.connection': userConnection };
         // const update = { $set: { 'userConnections.rsvp': userConnection.rsvp }, $push: { 'userConnections': userConnection } };
-
+        
         // finds the user's userprofile based on the id
         UserProfile.findOne({ _id: id }, 'userConnections', { new: true })
             .populate({ path: 'userConnections', model: 'userConnection', populate: { path: 'connection', model: 'connection' } }).exec(function (err, updatedUserProfile) {
@@ -101,13 +101,15 @@ userProfileSchema.methods.updateRSVP = function (updateID, rsvp) {
                 for (let i = 0; i < updatedUserProfile.userConnections.length; i++) {
                     //if the connection id matches updateID 
                     if (updatedUserProfile.userConnections[i].connection._id == updateID) {
-                        //if rsvp doesn't match new rsvp then set new rsvp
+                        //if rsvp doesn't match 
                         if (updatedUserProfile.userConnections[i].rsvp != rsvp) {
                             updatedUserProfile.userConnections[i].rsvp = rsvp;
                             updatedUserProfile.userConnections[i].save((err) => reject(err));
+
                             return resolve();
                         }
                         else {
+
                             return reject();
                         }
                     }
@@ -118,13 +120,10 @@ userProfileSchema.methods.updateRSVP = function (updateID, rsvp) {
     })
 }
 
-//method that gets all the connections from the array of user connections
 userProfileSchema.methods.getConnections = async function () {
     let profileId = this._id;
     return new Promise(function (resolve, reject) {
-        //finds the userprofile and populates it
         UserProfile.findOne({ _id: profileId }).populate({ path: 'userConnections', model: 'userConnection', populate: { path: 'connection', model: 'connection' } }).exec(function (err, populatedUserProfile) {
-            //if the userprofile exist and is not null then return the array of userConnections
             if (populatedUserProfile != null) {
                 return resolve(populatedUserProfile.userConnections);
             }

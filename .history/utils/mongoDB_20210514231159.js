@@ -5,7 +5,7 @@ const UserProfile = require('../models/userProfile-model');
 const UserConnection = require('../models/userConnection-model')
 
 
-//method to set up the database
+//method to set up mongo
 function setUpMongo() {
     const db = 'mongodb://localhost/meetupdb';
     mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
@@ -16,7 +16,6 @@ function setUpMongo() {
     return mongodb;
 }
 
-//method to add the hard coded connections
 function addHardCodedConnections() {
     // Hard Coded Connections
     let connections = [
@@ -125,7 +124,8 @@ async function setUpUser() {
     console.log('Password: test');
 }
 
-//Initialize the database and setup the connections and user
+
+
 const mongodb = setUpMongo();
 mongodb.then(() => {
     addHardCodedConnections();

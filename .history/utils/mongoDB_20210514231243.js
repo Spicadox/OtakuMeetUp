@@ -125,7 +125,7 @@ async function setUpUser() {
     console.log('Password: test');
 }
 
-//Initialize the database and setup the connections and user
+//Initialize the database and setup 
 const mongodb = setUpMongo();
 mongodb.then(() => {
     addHardCodedConnections();

@@ -1,4 +1,5 @@
 const express = require('express');
+const connectionDB = require('../utils/connectionDB');
 const Connection = require('../models/connection-model');
 
 const router = express.Router();
