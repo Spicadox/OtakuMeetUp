@@ -29,5 +29,5 @@ app.use('/', userRouter);
 // Use the mainRouter for all pages that are not connection or connections page
 app.use('/', mainRouter);
 
-// listen to port 3000
-app.listen(3000);
+// listen to port 80
+app.listen(80);
