@@ -8,5 +8,7 @@
     "mongoose": "^5.12.7",
     "nodemon": "^2.0.7"
   },
-  "start": "app.js"
+  "scripts": {
+    "start": "app.js"
+  }
 }
