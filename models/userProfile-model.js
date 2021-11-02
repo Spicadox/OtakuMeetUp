@@ -27,11 +27,11 @@ userProfileSchema.methods.addConnection = function (userConnection) {
                 // iterate through all the userConnections in the user profile
                 for (let i = 0; i < updatedUserProfile.userConnections.length; i++) {
                     // updates rsvp if connection title and category matches that from the new user coconnection
+                    console.log(updatedUserProfile.userConnections[i].connection.title == userConnection.connection.title && updatedUserProfile.userConnections[i].connection.category == userConnection.connection.category)
                     if (updatedUserProfile.userConnections[i].connection.title == userConnection.connection.title && updatedUserProfile.userConnections[i].connection.category == userConnection.connection.category) {
                         if (updatedUserProfile.userConnections[i].rsvp != userConnection.connection.rsvp) {
                             updatedUserProfile.userConnections[i].rsvp = userConnection.rsvp;
                             updatedUserProfile.userConnections[i].save((err) => reject(err));
-                            return resolve();
                         }
                         else {
                             return reject();
@@ -39,9 +39,8 @@ userProfileSchema.methods.addConnection = function (userConnection) {
                     }
                     // push the userconnection into the array of user connections if the iteration reaches the end and there are no connection match
                     else if (i == updatedUserProfile.userConnections.length - 1) {
-                        updatedUserProfile.userConnections.push(userConnection);
-                        updatedUserProfile.save();
-                        return resolve();
+                        updatedUserProfile.userConnections.push(userConnection)
+                        updatedUserProfile.save()
                     }
                 }
                 // push the userconnection into the array of user connections if there are no userconnections
@@ -50,9 +49,7 @@ userProfileSchema.methods.addConnection = function (userConnection) {
                     updatedUserProfile.save();
                     return resolve();
                 }
-
             })
-
     })
 }
 
@@ -73,8 +70,7 @@ userProfileSchema.methods.removeConnection = function (deleteID) {
                     if (updatedUserProfile.userConnections[i].connection._id == deleteID) {
                         let userConnectionID = updatedUserProfile.userConnections[i]._id;
                         updatedUserProfile.userConnections.splice(i, 1);
-                        UserConnection.deleteOne({ _id: userConnectionID });
-                        updatedUserProfile.save();
+                        UserConnection.deleteOne({ _id: userConnectionID }).then(() => updatedUserProfile.save())
                         return resolve();
                     }
                     //fail safe to reject the promise if there are no connection match(should never come to this though)
