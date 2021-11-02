@@ -7,8 +7,7 @@ const UserConnection = require('../models/userConnection-model')
 
 //method to set up the database
 function setUpMongo() {
-    // const db = 'mongodb://localhost/meetupdb';
-    const db = process.env.MONGODB_URI || 'mongodb+srv://admin:admin0@cluster0.oxrfv.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+    const db = process.env.MONGODB_URI || 'mongodb://localhost/meetupdb';
     mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
     const mongodb = mongoose.connection;
 
