@@ -20,8 +20,8 @@ router.use('/', function (req, res, next) {
     }
 });
 
-var queryUserProfile;
-var queryUser;
+// var queryUserProfile;
+// var queryUser;
 // Post request for signing up
 router.post(['/signup', 'signup.ejs'], function (req, res) {
     User.findOne({ fName: req.body.fName, lName: req.body.lName, email: req.body.email, password: req.body.password })
@@ -32,6 +32,7 @@ router.post(['/signup', 'signup.ejs'], function (req, res) {
                 new User({ fName: req.body.fName, lName: req.body.lName, email: req.body.email, password: req.body.password }).save()
                     .then((newUser) => {
                         new UserProfile({ user: newUser, userConnections: new UserConnection() }).save()
+                            // Not needed anymore
                             .then((userProfile) => queryUserProfile = userProfile)
                             .catch((err) => console.log(err));
                     });
@@ -94,11 +95,10 @@ router.post(['/login', '/login.ejs'], async function (req, res) {
 // Post request to display all the user connections on the savedConnections page
 router.post(['/savedConnections'], async function (req, res) {
     // if not logged in
-    if (queryUserProfile == undefined) {
+    if (req.session.user == undefined) {
         res.redirect('signup');
     }
-    let newUserProfile = queryUserProfile;
-    console.log(newUserProfile);
+    userProfile = await UserProfile.findOne({ user: req.session.user });
     if (req.session.previousPath == "/connection") {
 
         // parse json
@@ -114,44 +114,38 @@ router.post(['/savedConnections'], async function (req, res) {
             location: parsedConnection.location
         });
         // create and await saving the new user connection with rsvp
-        let newUserConnection = new UserConnection({ _id: Mongoose.Types.ObjectId(), connection: newConnection, rsvp: req.body.rsvp });
+        let newUserConnection = await new UserConnection({ _id: Mongoose.Types.ObjectId(), connection: newConnection, rsvp: req.body.rsvp });
         await newUserConnection.save();
-
+        console.log("saved new connection")
         // add the new user connection to the userprofile
         try {
-            await newUserProfile.addConnection(newUserConnection);
-            console.log('Adding user connection');
+            userProfile = await userProfile.addConnection(newUserConnection);
+
         } catch (err) {
             console.log(err);
         }
 
         // await getting all the connections so it can be rendered 
         try {
-            console.log('Getting user connections');
-            req.session.userProfileConnections = await newUserProfile.getConnections();
-            console.log('Got user Connections');
-            console.log(req.session.userProfileConnections);
+            req.session.userProfileConnections = await userProfile.getConnections();
         } catch (err) {
             console.log(err);
         }
-        console.log('Rendering all connections');
         res.render("savedConnections", { userProfile: req.session.userProfileConnections, req: req });
     }
     // for updating the RSVP if update button was clicked
     else if (req.session.previousPath == "/savedConnections") {
 
-        // req.session.userProfileConnections = newUserProfile.userConnections;
-
         // await updating the rsvp
         try {
             console.log(req.session.connection);
-            await newUserProfile.updateRSVP(req.session.updateID, req.body.rsvp);
+            await userProfile.updateRSVP(req.session.updateID, req.body.rsvp);
         } catch (err) {
             console.log(err);
         }
         // await getting the connections so it can be rendered
         try {
-            req.session.userProfileConnections = await newUserProfile.getConnections();
+            req.session.userProfileConnections = await userProfile.getConnections();
         } catch (err) {
             console.log(err)
         }
@@ -167,14 +161,15 @@ router.get(['/savedConnections', '/savedConnections.ejs'], function (req, res) {
 // routes to the savedConnections page after deleting a userConnection
 router.post(['/deleted'], async function (req, res) {
     try {
+        userProfile = await UserProfile.findOne({ user: req.session.user });
         console.log(req.session.connection);
-        await queryUserProfile.removeConnection(req.body.deleteID);
+        await userProfile.removeConnection(req.body.deleteID);
         console.log("DONE UPDATING")
     } catch (err) {
         console.log(err);
     }
     try {
-        req.session.userProfileConnections = await queryUserProfile.getConnections();
+        req.session.userProfileConnections = await userProfile.getConnections();
         console.log("GETTING CONNECTIONS")
     } catch (err) {
         console.log(err)
@@ -196,6 +191,7 @@ router.post('/update', async function (req, res) {
 
 // routes to users' connections page after creating a new connection
 router.post('/newConnection', async function (req, res) {
+    userProfile = await UserProfile.findOne({ user: req.session.user });
     let newConnection = new Connection({
         title: req.body.name,
         category: req.body.topic,
@@ -212,14 +208,14 @@ router.post('/newConnection', async function (req, res) {
     newUserConnection.save();
 
     try {
-        await queryUserProfile.addConnection(newUserConnection);
+        await userProfile.addConnection(newUserConnection);
     }
     catch (err) {
         console.log(err);
     }
 
     try {
-        req.session.userProfileConnections = await queryUserProfile.getConnections();
+        req.session.userProfileConnections = await userProfile.getConnections();
     } catch (err) {
         console.log(err);
     }
@@ -230,7 +226,7 @@ router.post('/newConnection', async function (req, res) {
 // routes to the newConnection page
 router.get(['/newConnection', '/newConnection.ejs'], function (req, res) {
     // if not logged in
-    if (queryUserProfile == undefined) {
+    if (req.session.user == undefined) {
         res.redirect('signup');
     }
     res.render("newConnection", { req: req })
