@@ -17,7 +17,7 @@ const userProfileSchema = new Schema({
 // takes in the user connection to add and returns the promise
 userProfileSchema.methods.addConnection = function (userConnection) {
     let id = this._id;
-    return new Promise(function (resolve, reject) {
+    return new Promise(async function (resolve, reject) {
         // const filter = { _id: this._id, 'userConnections.connection': userConnection };
         // const update = { $set: { 'userConnections.rsvp': userConnection.rsvp }, $push: { 'userConnections': userConnection } };
 
@@ -40,14 +40,14 @@ userProfileSchema.methods.addConnection = function (userConnection) {
                     // push the userconnection into the array of user connections if the iteration reaches the end and there are no connection match
                     else if (i == updatedUserProfile.userConnections.length - 1) {
                         updatedUserProfile.userConnections.push(userConnection)
-                        updatedUserProfile.save()
+                        updatedUserProfile.save(() => { return resolve(updatedUserProfile) })
                     }
                 }
                 // push the userconnection into the array of user connections if there are no userconnections
                 if (updatedUserProfile.userConnections.length == 0) {
                     updatedUserProfile.userConnections.push(userConnection);
-                    updatedUserProfile.save();
-                    return resolve();
+                    updatedUserProfile.save(() => { return resolve(updatedUserProfile) })
+
                 }
             })
     })
@@ -122,6 +122,7 @@ userProfileSchema.methods.getConnections = async function () {
         UserProfile.findOne({ _id: profileId }).populate({ path: 'userConnections', model: 'userConnection', populate: { path: 'connection', model: 'connection' } }).exec(function (err, populatedUserProfile) {
             //if the userprofile exist and is not null then return the array of userConnections
             if (populatedUserProfile != null) {
+                console.log(populatedUserProfile)
                 return resolve(populatedUserProfile.userConnections);
             }
             else {
